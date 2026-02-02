@@ -1,0 +1,80 @@
+﻿@page "/"
+
+<div class="min-h-screen bg-gray-100 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden md:flex">
+        
+        <div class="p-8 md:w-1/2 bg-white">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Máy tính Tích lũy ETF</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Số tiền nạp hàng tháng (VNĐ)</label>
+                    <input type="number" @bind="monthlyAmount" class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Lãi suất kỳ vọng (%/năm)</label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" min="1" max="20" @bind="annualRate" class="flex-1" />
+                        <span class="font-bold text-blue-600">@annualRate%</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Số năm đầu tư</label>
+                    <input type="number" @bind="years" class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+            </div>
+
+            <button @onclick="Calculate" class="w-full mt-8 bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg">
+                TÍNH TOÁN KẾT QUẢ
+            </button>
+        </div>
+
+        <div class="p-8 md:w-1/2 bg-blue-600 text-white flex flex-col justify-center">
+            <p class="text-blue-100 text-sm uppercase tracking-wider font-semibold">Tổng tài sản dự kiến</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold mt-2">@totalBalance.ToString("N0")đ</h1>
+            
+            <div class="mt-8 space-y-3 border-t border-blue-400 pt-6">
+                <div class="flex justify-between">
+                    <span class="opacity-80">Tổng vốn góp:</span>
+                    <span class="font-semibold">@totalPrincipal.ToString("N0")đ</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="opacity-80">Tiền lãi nhận được:</span>
+                    <span class="font-semibold text-green-300">+@((totalBalance - totalPrincipal).ToString("N0"))đ</span>
+                </div>
+            </div>
+
+            <div class="mt-10 p-4 bg-blue-700 rounded-lg text-sm">
+                <p class="italic">"Đừng để tiền nhàn rỗi, hãy bắt đầu tích lũy ETF VN30 ngay hôm nay."</p>
+                <a href="LINK_AFFILIATE_CUA_BAN" target="_blank" class="block mt-2 font-bold underline hover:text-orange-300">Mở tài khoản nhận ưu đãi →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private decimal monthlyAmount = 2500000;
+    private double annualRate = 12;
+    private int years = 10;
+    private decimal totalBalance;
+    private decimal totalPrincipal;
+
+    protected override void OnInitialized() => Calculate();
+
+    private void Calculate()
+    {
+        totalBalance = 0;
+        totalPrincipal = 0;
+        double monthlyRate = (annualRate / 100) / 12;
+        int totalMonths = years * 12;
+
+        for (int i = 1; i <= totalMonths; i++)
+        {
+            totalPrincipal += monthlyAmount;
+            totalBalance = (totalBalance + monthlyAmount) * (decimal)(1 + monthlyRate);
+        }
+        totalBalance = Math.Round(totalBalance, 0);
+    }
+}
